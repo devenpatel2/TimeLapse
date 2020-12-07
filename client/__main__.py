@@ -6,7 +6,6 @@ from functools import partial
 import logging
 import os
 import socket
-import struct
 import typing as T
 import time
 
@@ -35,7 +34,6 @@ LONG = 11.509070
 WEATHER_API = "79072d2ce0e828772115aa080119dac8"
 URL = ("http://api.openweathermap.org/data/2.5/weather?"
        f"lat={LAT}&lon={LONG}&appid={WEATHER_API}")
-
 
 
 def get_weather_data():

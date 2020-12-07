@@ -1,5 +1,6 @@
 import signal
 
+
 class ShutdownHandler(object):
 
     shutdown = False

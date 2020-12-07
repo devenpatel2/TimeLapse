@@ -30,14 +30,16 @@ server_port = 8080
 
 HEADERS = {'content-type': 'multipart/form-data; '
            'boundary=my-boundary'}
-HEADERS = {'content-type' : 'application/json'}
+HEADERS = {'content-type': 'application/json'}
 LAT = 48.107580
 LONG = 11.509070
 WEATHER_API = "79072d2ce0e828772115aa080119dac8"
 URL = ("http://api.openweathermap.org/data/2.5/weather?"
-        f"lat={LAT}&lon={LONG}&appid={WEATHER_API}")
+       f"lat={LAT}&lon={LONG}&appid={WEATHER_API}")
 
-float2byte = lambda x : bytearray(struct.pack("f", x)) 
+
+def float2byte(x): return bytearray(struct.pack("f", x))
+
 
 def get_weather_data():
     res = requests.get(URL)
@@ -48,25 +50,27 @@ def get_weather_data():
     print(temp, wind)
     return {'temperature': temp, 'wind': wind}
 
+
 def get_post_data(image: np.ndarray) -> T.Dict:
     now_ts = time.time()
-    now_human_readable = datetime.fromtimestamp(now_ts).strftime('%Y_%m_%d_%H_%M_%S')
+    now_human_readable = datetime.fromtimestamp(
+        now_ts).strftime('%Y_%m_%d_%H_%M_%S')
     image_name = f"{now_human_readable}.jpg"
     buffer = cv2.imencode('.jpg', image)[1]
-    b64_image =  b64encode(buffer)
-    #print(type(b64_image))
+    b64_image = b64encode(buffer)
+    # print(type(b64_image))
     data = {'image': b64_image.decode('utf-8'),
             'filename': image_name,
-            'timestamp': int(now_ts * 1000) }
+            'timestamp': int(now_ts * 1000)}
     data['weather'] = get_weather_data()
-    #for key, val in get_weather_data().items():
+    # for key, val in get_weather_data().items():
     #    data.update({key:float2byte(val)})
 
-    return data    
+    return data
 
 
 def post_image(url: Path, image: np.ndarray) -> bool:
-    
+
     url = f"http://{url}:{server_port}{api_route}"
     data = get_post_data(image)
     logger.info(f"posting image to {url}")
@@ -106,10 +110,9 @@ def capture_image(
         logger.error("Failed to save image", exc_info=True)
 
 
-
 def main(args):
     shutdown_handler = ShutdownHandler()
-    cam = getattr(camera, args.camera)() 
+    cam = getattr(camera, args.camera)()
 
     if is_ip(args.output):
         save_func = partial(post_image, args.output)
@@ -133,8 +136,10 @@ if __name__ == "__main__":
     parser = ArgumentParser(description="Timelapse Camera")
     parser.add_argument("-c", "--camera", required=True, help="Type of camera",
                         choices=["WebCam", "Basler", "DigitalCam"])
-    parser.add_argument("-t", "--time", required=True, type=int, help="Time interval for capture")
-    parser.add_argument("-o", "--output", required=True, help="Path/URL to save/upload images")
+    parser.add_argument("-t", "--time", required=True,
+                        type=int, help="Time interval for capture")
+    parser.add_argument("-o", "--output", required=True,
+                        help="Path/URL to save/upload images")
     args = parser.parse_args()
 
     main(args)

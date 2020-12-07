@@ -3,7 +3,6 @@ from argparse import ArgumentParser
 from base64 import b64encode
 from datetime import datetime
 from functools import partial
-import io
 import logging
 import os
 import socket
@@ -38,8 +37,6 @@ URL = ("http://api.openweathermap.org/data/2.5/weather?"
        f"lat={LAT}&lon={LONG}&appid={WEATHER_API}")
 
 
-def float2byte(x): return bytearray(struct.pack("f", x))
-
 
 def get_weather_data():
     res = requests.get(URL)
@@ -58,13 +55,10 @@ def get_post_data(image: np.ndarray) -> T.Dict:
     image_name = f"{now_human_readable}.jpg"
     buffer = cv2.imencode('.jpg', image)[1]
     b64_image = b64encode(buffer)
-    # print(type(b64_image))
     data = {'image': b64_image.decode('utf-8'),
             'filename': image_name,
             'timestamp': int(now_ts * 1000)}
     data['weather'] = get_weather_data()
-    # for key, val in get_weather_data().items():
-    #    data.update({key:float2byte(val)})
 
     return data
 

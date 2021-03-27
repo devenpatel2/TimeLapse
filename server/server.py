@@ -3,12 +3,9 @@ from datetime import datetime
 import json
 import logging
 import os
-import struct
 import typing as T
 
-from aiohttp import web, MultipartReader
-import cv2
-import numpy as np
+from aiohttp import web  # , MultipartReader
 
 from influx_handler import InfluxHandler
 
@@ -22,7 +19,8 @@ routes = web.RouteTableDef()
 PATH = "data"
 
 
-def now(): return datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
+def now():
+    return datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
 
 
 class Record:
@@ -127,7 +125,7 @@ async def post_files(request):
 @routes.post('/api/data')
 async def post_data(request):
 
-    #influx_handler = app['influx_handler']
+    # influx_handler = app['influx_handler']
     record = Record()
 
     data = await request.text()

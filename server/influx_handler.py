@@ -2,17 +2,19 @@ from collections import namedtuple
 from influxdb_client import InfluxDBClient, Point
 from influxdb_client.client.write_api import SYNCHRONOUS
 
-TOKEN = ""
+TOKEN = "qe9xKApah-360wBw0AXKhuz1OsuIuIqkb6I7wM56uRAMUE-Db1NtMgkLkUXDBvNMUGaNjYXWacthtV8xLmKJyw=="
 INFLUX_INFO = namedtuple("INFLUX_INFO",
-                        "url, token, org")
+                         "url, token, org")
+
+
 class InfluxHandler:
 
     def __init__(self,
-        host: str='localhost',
-        port: int=8086,
-        token: str=TOKEN,
-        org: str='test'):
-    
+                 host: str = 'localhost',
+                 port: int = 8086,
+                 token: str = TOKEN,
+                 org: str = 'test'):
+
         url = f"http://{host}:{port}"
 
         self._db_info = INFLUX_INFO(url, token, org)
@@ -24,7 +26,7 @@ class InfluxHandler:
 
         self._write_api = self._client.write_api(write_options=SYNCHRONOUS)
         return self
-    
+
     def __exit__(self, exc_type, exc_val, exc_tb):
         self._client.close()
 
@@ -39,4 +41,3 @@ class InfluxHandler:
         if self._write_api is None:
             self._init()
         self._write_api.write(bucket, self._db_info.org, data_point)
-

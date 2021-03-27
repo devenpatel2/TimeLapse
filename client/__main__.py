@@ -13,12 +13,12 @@ import cv2
 import numpy as np
 import requests
 
-import camera
-from camera import Camera
-from utils import ShutdownHandler
+from . import camera
+from .camera import Camera
+from .utils import ShutdownHandler
 
 logging.basicConfig()
-logger = logging.getLogger()
+logger = logging.getLogger('client')
 logger.setLevel(logging.INFO)
 
 Path = T.Union[str, os.PathLike]
@@ -126,12 +126,14 @@ def main(args):
 if __name__ == "__main__":
 
     parser = ArgumentParser(description="Timelapse Camera")
-    parser.add_argument("-c", "--camera", required=True, help="Type of camera",
+
+    parser.add_argument("-c", "--camera", help="Type of camera",
+                        default="WebCam",
                         choices=["WebCam", "Basler", "DigitalCam"])
     parser.add_argument("-t", "--time", required=True,
                         type=int, help="Time interval for capture")
     parser.add_argument("-o", "--output", required=True,
                         help="Path/URL to save/upload images")
+    parser.prog = "client"
     args = parser.parse_args()
-
     main(args)

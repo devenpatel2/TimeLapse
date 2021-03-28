@@ -17,6 +17,12 @@ class Camera(ABC):
     def __init__(self, camera_type="generic"):
         self._camera_type = camera_type
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
+
     @property
     def camera_type(self):
         return self._camera_type
@@ -30,10 +36,6 @@ class Camera(ABC):
 
     @abstractmethod
     def close(self):
-        pass
-
-    def stream(self):
-        # TO-DO
         pass
 
 
@@ -55,16 +57,15 @@ class WebCam(Camera):
 
     def __init__(self):
         super().__init__(camera_type="WebCam")
+        self._camera = cv2.VideoCapture(0)
 
     def close(self):
         self._camera.release()
 
     def capture(self):
-        self._camera = cv2.VideoCapture(0)
         ret, frame = self._camera.read()
         if not ret:
             raise Exception("Failed to capture image")
-        self._camera.release()
         return frame
 
 
@@ -95,6 +96,7 @@ class Basler(Camera):
         return image.GetArray()
 
     def close(self):
+        logger.info("closing camera")
         self._camera.Close()
 
 
@@ -119,11 +121,6 @@ class DigitalCam(Camera):
         camera_file.save(target)
         image = cv2.imread(target)
         return image
-
-    def dummy_image(self):
-        rnd_image = np.random.randint(
-            0, 255, [100, 100, 3]).astype(dtype=np.uint8)
-        return rnd_image
 
 
 def test_driver():

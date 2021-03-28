@@ -138,6 +138,9 @@ async def post_data(request):
             logger.error(f"failed to set attr {key}", exc_info=True)
 
     if record.filename and record.image:
+        dirname = os.path.dirname(record.filename)
+        if not os.path.exists(dirname):
+            os.makedirs(dirname)
         with open(record.filename, 'wb') as f:
             f.write(record.image)
 
@@ -157,5 +160,5 @@ if __name__ == "__main__":
 
     app = web.Application()
     app.add_routes(routes)
-    app['influx_handler'] = InfluxHandler()
+    # app['influx_handler'] = InfluxHandler()
     web.run_app(app, port=8080)

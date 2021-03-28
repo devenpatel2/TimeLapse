@@ -13,6 +13,7 @@ addition_args += ["webcam", "basler", "digitalcam", "picam"]
 args, _ = parser.parse_known_args()
 install_requires = [
     "aiohttp",
+    "attrs",
     "influxdb-client",
     "numpy",
     "opencv-python-headless",
@@ -37,7 +38,6 @@ for arg in arg_list:
     if arg in addition_args:
         sys.argv.remove(arg)
 
-print(sys.argv)
 setup(
     name='timelapse',
     version='0.1',

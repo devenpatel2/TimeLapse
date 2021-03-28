@@ -1,15 +1,33 @@
 from abc import ABC, abstractmethod
 import os
 import logging
+import time
 
 import cv2
-import gphoto2 as gp
-from pypylon import pylon
 import numpy as np
 
 logging.basicConfig()
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
+
+
+try:
+    import gphoto2 as gp
+except (ImportError, ModuleNotFoundError):
+    logger.warning("Failed to import gphoto2 "
+                   "Only needed for DigitalCamera")
+try:
+    from pypylon import pylon
+except (ImportError, ModuleNotFoundError):
+    logger.warning("Failed to import pypylon "
+                   "Only needed for Basler Camera")
+
+try:
+    from picamera import PiCamera
+    from picamera.array import PiRGBArray
+except (ImportError, ModuleNotFoundError):
+    logger.warning("Failed to import picamera "
+                   "Only needed for Pi-Cam")
 
 
 class Camera(ABC):
@@ -28,7 +46,7 @@ class Camera(ABC):
         return self._camera_type
 
     @abstractmethod
-    def capture(self):
+    def capture(self, *kwargs):
         pass
 
     def start(self):
@@ -38,6 +56,9 @@ class Camera(ABC):
     def close(self):
         pass
 
+
+    def __repr__(self):
+        return f"Camera({self._camera_type})"
 
 class DummyCam(Camera):
 
@@ -60,6 +81,7 @@ class WebCam(Camera):
         self._camera = cv2.VideoCapture(0)
 
     def close(self):
+        logger.info("closing camera")
         self._camera.release()
 
     def capture(self):
@@ -111,6 +133,8 @@ class DigitalCam(Camera):
         logger.info("closing camera")
         self._camera.exit()
 
+    # TO-DO
+    # implement continous capture for streaming
     def capture(self, tmp_path="/tmp/gp2_capture"):
         if not os.path.exists(tmp_path):
             os.makedirs(tmp_path)
@@ -121,6 +145,37 @@ class DigitalCam(Camera):
         camera_file.save(target)
         image = cv2.imread(target)
         return image
+
+
+class PiCam(Camera):
+
+    def  __init__(self):
+        super().__init__(camera_type="PiCamera")
+        self._init_camera()
+
+
+    def _init_camera(self):
+        self._camera = PiCamera()
+        self._camera.resolution = (1280, 720)
+        self._camera.start_preview()
+        logger.info("Initializing PiCamera...")
+        time.sleep(2)
+
+
+    def stream(self):
+        with PiRGBArray(self._camera) as stream:
+            self._camera.capture(stream, format='bgr')
+            yield stream.array.astype(np.uint8)
+
+
+    def capture(self):
+        with PiRGBArray(self._camera) as stream:
+            self._camera.capture(stream, format='bgr')
+            return stream.array
+
+    def close(self):
+        logger.info("closing camera")
+        self._camera.close()
 
 
 def test_driver():

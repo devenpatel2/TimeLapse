@@ -26,6 +26,10 @@ def run(args):
 
     while True:
         with getattr(camera, args.camera)() as cam:
+            print(cam)
+            if args.camera == "PiCam":
+                print("setting single-shot")
+                cam.single_shot = True
             ch.capture_image(cam, save_func)
         time.sleep(args.time)
 
@@ -35,7 +39,10 @@ def stream(args):
     print(args)
     cam = getattr(camera, args.camera)()
     mjpeg = MjpegServer(port=args.port)
-    mjpeg.add_stream('stream', cam.capture)
+    if args.camera == "PiCam":
+        mjpeg.add_stream('stream', cam.stream)
+    else:
+        mjpeg.add_stream('stream', cam.capture)
 
     try:
         asyncio.run(mjpeg.start())
@@ -55,7 +62,7 @@ if __name__ == "__main__":
     run_parser = sub_parsers.add_parser('run', help='start application')
     run_parser.add_argument("-c", "--camera", help="Type of camera",
                             default="WebCam",
-                            choices=["WebCam", "Basler", "DigitalCam"])
+                            choices=["WebCam", "Basler", "DigitalCam", "PiCam"])
     run_parser.add_argument("-t", "--time", required=True,
                             type=int, help="Time interval for capture")
     run_parser.add_argument("-o", "--output", required=True,
@@ -64,10 +71,10 @@ if __name__ == "__main__":
 
     stream_parser = sub_parsers.add_parser('stream', help='start mjpeg stream')
     stream_parser.add_argument(
-        '-p', '--port', type=str, default='8000', help='Mjpeg steam port')
+        '-p', '--port', type=str, default='8080', help='Mjpeg steam port')
     stream_parser.add_argument("-c", "--camera", help="Type of camera",
                                default="WebCam",
-                               choices=["WebCam", "Basler", "DigitalCam"])
+                               choices=["WebCam", "Basler", "DigitalCam", "PiCam"])
     stream_parser.set_defaults(func=stream)
 
     parser.prog = "client"

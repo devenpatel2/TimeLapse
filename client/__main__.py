@@ -26,10 +26,6 @@ def run(args):
 
     while True:
         with getattr(camera, args.camera)() as cam:
-            print(cam)
-            if args.camera == "PiCam":
-                print("setting single-shot")
-                cam.single_shot = True
             ch.capture_image(cam, save_func)
         time.sleep(args.time)
 

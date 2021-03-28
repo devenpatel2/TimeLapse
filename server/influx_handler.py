@@ -2,7 +2,7 @@ from collections import namedtuple
 from influxdb_client import InfluxDBClient, Point
 from influxdb_client.client.write_api import SYNCHRONOUS
 
-TOKEN = "qe9xKApah-360wBw0AXKhuz1OsuIuIqkb6I7wM56uRAMUE-Db1NtMgkLkUXDBvNMUGaNjYXWacthtV8xLmKJyw=="
+TOKEN = ""
 INFLUX_INFO = namedtuple("INFLUX_INFO",
                          "url, token, org")
 

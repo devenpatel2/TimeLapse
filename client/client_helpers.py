@@ -18,7 +18,7 @@ logger.setLevel(logging.INFO)
 
 Path = T.Union[str, os.PathLike]
 api_route = "/api/data"
-server_port = 8080
+server_port = 8082
 
 HEADERS = {'content-type': 'multipart/form-data; '
            'boundary=my-boundary'}

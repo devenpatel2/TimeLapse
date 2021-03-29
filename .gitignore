@@ -28,3 +28,4 @@ messages/
 .mypy_cache/
 Images/
 *data*
+resource/secret.json

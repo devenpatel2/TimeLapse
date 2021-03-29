@@ -7,7 +7,7 @@ import typing as T
 
 from aiohttp import web  # , MultipartReader
 
-from influx_handler import InfluxHandler
+from .influx_handler import InfluxHandler
 
 logging.basicConfig()
 logger = logging.getLogger("server")
@@ -16,7 +16,6 @@ logger.setLevel(logging.INFO)
 routes = web.RouteTableDef()
 
 
-PATH = "data"
 
 
 def now():
@@ -29,6 +28,7 @@ class Record:
         self._timestamp = None
         self._filename = None
         self._weather = None
+        self.path = '.'
 
     @property
     def image(self):
@@ -55,7 +55,7 @@ class Record:
     @filename.setter
     def filename(self, val: str):
         dir_name = datetime.utcnow().strftime('%Y_%m')
-        full_path = os.path.realpath(PATH)
+        full_path = os.path.realpath(self.path)
         val = os.path.join(full_path, dir_name, val)
         self._filename = val
 
@@ -125,7 +125,6 @@ async def post_files(request):
 @routes.post('/api/data')
 async def post_data(request):
 
-    # influx_handler = app['influx_handler']
     record = Record()
 
     data = await request.text()
@@ -137,16 +136,18 @@ async def post_data(request):
         except Exception:
             logger.error(f"failed to set attr {key}", exc_info=True)
 
+        record.path = request.app['data_path']
     if record.filename and record.image:
         dirname = os.path.dirname(record.filename)
         if not os.path.exists(dirname):
             os.makedirs(dirname)
         with open(record.filename, 'wb') as f:
             f.write(record.image)
-
+        logger.debug(record.data)
+        '''
         with InfluxHandler() as influx_handler:
             influx_handler.post('test_bucket', record.data)
-
+        '''
     else:
         return web.json_response(
             {"status": "Failed to write image", "status_code": 500}, status=500)
@@ -155,10 +156,12 @@ async def post_data(request):
 
 if __name__ == "__main__":
 
+    PATH = "data"
     if not os.path.exists(PATH):
         os.makedirs(PATH)
 
     app = web.Application()
+    app['data_path'] = PATH
     app.add_routes(routes)
     # app['influx_handler'] = InfluxHandler()
     web.run_app(app, port=8080)

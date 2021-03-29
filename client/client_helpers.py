@@ -1,5 +1,6 @@
 from base64 import b64encode
 from datetime import datetime
+import json
 import logging
 import os
 import socket
@@ -23,9 +24,14 @@ server_port = 8082
 HEADERS = {'content-type': 'multipart/form-data; '
            'boundary=my-boundary'}
 HEADERS = {'content-type': 'application/json'}
-LAT = 48.107580
-LONG = 11.509070
-WEATHER_API = "79072d2ce0e828772115aa080119dac8"
+
+with open('resource/secret.json') as f:
+    config_data = json.load(f)
+
+config = config_data['config']
+LAT = config['LAT']
+LONG = config['LONG']
+WEATHER_API = config['WEATHER_API']
 URL = ("http://api.openweathermap.org/data/2.5/weather?"
        f"lat={LAT}&lon={LONG}&appid={WEATHER_API}")
 

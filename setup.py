@@ -44,7 +44,7 @@ setup(
     packages=[
         'server', 'client'
     ],
-    package_date={'resource':['resources']},
+    package_date={'resource':['resource']},
     include_pacakge_data=True,
     install_requires=install_requires,
     zip_safe=False

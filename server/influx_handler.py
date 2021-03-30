@@ -10,12 +10,16 @@ INFLUX_INFO = namedtuple("INFLUX_INFO",
 class InfluxHandler:
 
     def __init__(self,
+                 token: str,
+                 org: str,
                  host: str = 'localhost',
                  port: int = 8086,
-                 token: str = TOKEN,
-                 org: str = 'test'):
+                ):
 
-        url = f"http://{host}:{port}"
+        if not host.startswith("http"):
+            url = f"http://{url}"
+
+        url = f"{host}:{port}"
 
         self._db_info = INFLUX_INFO(url, token, org)
         self._write_api = None

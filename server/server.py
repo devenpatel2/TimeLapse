@@ -13,9 +13,30 @@ logging.basicConfig()
 logger = logging.getLogger("server")
 logger.setLevel(logging.INFO)
 
+
+
+with open('resource/secret.json') as f:
+    config_data = json.load(f)
+
+config = config_data['server_config']
+INFLUX_HOST = config['influx']['HOST']
+INFLUX_PORT = config['influx']['PORT']
+INFLUX_VERSION = config['influx'].get("VERSION", '2.0')
+INFLUX_ORG = config['influx']['ORG']
+INFLUX_TOKEN = config['influx']['TOKEN']
+if float(INFLUX_VERSION) < 2.0:
+    database = config['influx']['DATABASE']
+    INFLUX_BUCKET = f"{database}/autogen"
+else:
+    INFLUX_BUCKET = config['influx']['BUCKET']
+
 routes = web.RouteTableDef()
 
-
+influx_args = {'token' : INFLUX_TOKEN,
+               'org' : INFLUX_ORG,
+               'host' : INFLUX_HOST,
+               'port' : INFLUX_PORT
+              }
 
 
 def now():
@@ -143,11 +164,9 @@ async def post_data(request):
             os.makedirs(dirname)
         with open(record.filename, 'wb') as f:
             f.write(record.image)
-        logger.debug(record.data)
-        '''
-        with InfluxHandler() as influx_handler:
-            influx_handler.post('test_bucket', record.data)
-        '''
+
+        with InfluxHandler(**influx_args) as influx_handler:
+            influx_handler.post(INFLUX_BUCKET, record.data)
     else:
         return web.json_response(
             {"status": "Failed to write image", "status_code": 500}, status=500)
@@ -164,4 +183,4 @@ if __name__ == "__main__":
     app['data_path'] = PATH
     app.add_routes(routes)
     # app['influx_handler'] = InfluxHandler()
-    web.run_app(app, port=8080)
+    web.run_app(app, port=8082)

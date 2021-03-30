@@ -56,9 +56,9 @@ class Camera(ABC):
     def close(self):
         pass
 
-
     def __repr__(self):
         return f"Camera({self._camera_type})"
+
 
 class DummyCam(Camera):
 
@@ -149,10 +149,9 @@ class DigitalCam(Camera):
 
 class PiCam(Camera):
 
-    def  __init__(self):
+    def __init__(self):
         super().__init__(camera_type="PiCamera")
         self._init_camera()
-
 
     def _init_camera(self):
         self._camera = PiCamera()
@@ -161,12 +160,10 @@ class PiCam(Camera):
         logger.info("Initializing PiCamera...")
         time.sleep(2)
 
-
     def stream(self):
         with PiRGBArray(self._camera) as stream:
             self._camera.capture(stream, format='bgr')
             yield stream.array.astype(np.uint8)
-
 
     def capture(self):
         with PiRGBArray(self._camera) as stream:

@@ -1,7 +1,7 @@
 from argparse import ArgumentParser
 import os
 import json
-from aiohttp  import web
+from aiohttp import web
 from .server import routes
 
 with open('resource/secret.json') as f:

@@ -14,7 +14,6 @@ logger = logging.getLogger("server")
 logger.setLevel(logging.INFO)
 
 
-
 with open('resource/secret.json') as f:
     config_data = json.load(f)
 
@@ -32,11 +31,11 @@ else:
 
 routes = web.RouteTableDef()
 
-influx_args = {'token' : INFLUX_TOKEN,
-               'org' : INFLUX_ORG,
-               'host' : INFLUX_HOST,
-               'port' : INFLUX_PORT
-              }
+influx_args = {'token': INFLUX_TOKEN,
+               'org': INFLUX_ORG,
+               'host': INFLUX_HOST,
+               'port': INFLUX_PORT
+               }
 
 
 def now():

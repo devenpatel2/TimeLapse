@@ -14,10 +14,10 @@ class InfluxHandler:
                  org: str,
                  host: str = 'localhost',
                  port: int = 8086,
-                ):
+                 ):
 
         if not host.startswith("http"):
-            url = f"http://{url}"
+            url = f"http://{host}"
 
         url = f"{host}:{port}"
 

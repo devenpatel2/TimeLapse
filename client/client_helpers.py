@@ -28,7 +28,7 @@ HEADERS = {'content-type': 'application/json'}
 with open('resource/secret.json') as f:
     config_data = json.load(f)
 
-config = config_data['config']
+config = config_data['client_config']
 LAT = config['LAT']
 LONG = config['LONG']
 WEATHER_API = config['WEATHER_API']
